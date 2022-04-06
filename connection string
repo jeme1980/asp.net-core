@@ -1,0 +1,21 @@
+builder.Services.AddDbContext<RazorPagesMovieContext>(options => 
+       options.UseSqlServer(builder.Configuration.GetConnectionString("RazorPagesMovieContext")));
+       
+"ConnectionStrings": {
+    "RazorPagesMovieContext": "Server=(localdb)\\mssqllocaldb;Database=RazorPagesMovieContext-bc;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+  
+using Microsoft.EntityFrameworkCore;
+using Rocky.Models;
+
+namespace Rocky.Models
+{
+    public class ApplicationDbContext:DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext>options):base(options)
+        {
+        }
+        public DbSet<Category> Category { get; set; }
+        public DbSet<Product> Products { get; set; }
+    }
+}
