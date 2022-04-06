@@ -17,6 +17,5 @@ namespace Rocky.Models
     "RazorPagesMovieContext": "Server=(localdb)\\mssqllocaldb;Database=RazorPagesMovieContext-bc;Trusted_Connection=True;MultipleActiveResultSets=true"
   }
   
-  
-  builder.Services.AddDbContext<RazorPagesMovieContext>(options => 
-       options.UseSqlServer(builder.Configuration.GetConnectionString("RazorPagesMovieContext")));
+ builder.Services.AddDbContext<MvcMovieContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MvcMovieContext")));
