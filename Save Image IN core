@@ -1,0 +1,132 @@
+1) first add aclass
+ public class WC
+    {
+        public static string ImgPath = @"\images\product\";
+    }
+
+
+[HttpGet]
+        public IActionResult AddOrEdit(int? id)
+        {
+            Product product = new Product();
+            if (id == null)
+            {
+                ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Name");
+                return View(product);
+            }
+            else
+            {
+                product = _context.Products.Find(id);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+                ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Name");
+                return View(product);
+            }
+        }
+        [HttpPost]
+        public IActionResult AddOrEdit(Product product)
+        {
+            if (ModelState.IsValid)
+            {
+                var files = HttpContext.Request.Form.Files;
+                string webrootpath = _webHostEnvironment.WebRootPath;
+                if (product.Id == 0)
+                {
+                    if (files.Count > 0)
+                    {
+                        string upload = webrootpath + WC.ImgPath;
+                        string filename = Guid.NewGuid().ToString();
+                        string exetion = Path.GetExtension(files[0].FileName);
+                        using (var filestreem = new FileStream(Path.Combine(upload, filename + exetion), FileMode.Create))
+                        {
+                            files[0].CopyTo(filestreem);
+                        }
+                        product.Image = filename + exetion;
+                    }
+                    product.DateCreated = DateTime.Now;
+                    _context.Products.Add(product);
+                }
+                else
+                {
+                    var objfromdb = _context.Products.AsNoTracking().FirstOrDefault(p => p.Id == product.Id);
+                    if (files.Count > 0)
+                    {
+                        string upload = webrootpath + WC.ImgPath;
+                        string filename = Guid.NewGuid().ToString();
+                        string exetion = Path.GetExtension(files[0].FileName);
+
+                        if (!string.IsNullOrEmpty(objfromdb.Image))
+                        {
+                            var oldpath = Path.Combine(upload, objfromdb.Image);
+                            if (System.IO.File.Exists(oldpath))
+                            {
+                                System.IO.File.Delete(oldpath);
+                            }
+                        }
+ 
+                        using (var filestreem = new FileStream(Path.Combine(upload, filename + exetion), FileMode.Create))
+                        {
+                            files[0].CopyTo(filestreem);
+                        }
+                        
+                        product.Image = filename + exetion;
+                    }
+                    else
+                    {
+                        product.Image = objfromdb.Image;
+                    }
+                    _context.Products.Update(product);
+                }
+                _context.SaveChanges();
+                return RedirectToAction("index");
+            }
+            ViewData["CategoryId"] = new SelectList(_context.Category, "Id", "Name");
+            return View(product);
+        }
+
+
+
+
+        // GET: Product/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Products
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
+        }
+
+        // POST: Product/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            string webrootpath = _webHostEnvironment.WebRootPath;
+            string upload = webrootpath + WC.ImgPath;
+
+            if (!string.IsNullOrEmpty(product.Image))
+            {
+                var oldpath = Path.Combine(upload, product.Image);
+                if (System.IO.File.Exists(oldpath))
+                {
+                    System.IO.File.Delete(oldpath);
+                }
+            }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
