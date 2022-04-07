@@ -1,0 +1,91 @@
+
+public static class SeedData
+    {
+            public static async Task SeedUser(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+            string[] roleName = { "admin", "user" };
+            IdentityResult identityResult;
+            foreach (var role in roleName)
+            {
+                var rolexit = await roleManager.RoleExistsAsync(role);
+                if (!rolexit)
+                {
+                    identityResult = await roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
+            var email = "jeme1980@hotmail.com";
+            var password = "Jeme1980@";
+            if (userManager.FindByEmailAsync(email).Result == null)
+            {
+                AppUser user = new()
+                {
+                    Email = email,
+                    UserName = email
+                };
+                IdentityResult result = userManager.CreateAsync(user, password).Result;
+                if (result.Succeeded)
+                {
+                    userManager.AddToRoleAsync(user, "admin").Wait();
+                }
+            }
+        }
+        
+        
+        public static void Initialize(IServiceProvider serviceProvider)
+        {
+            using (var context = new ApplicationDbContext(
+                serviceProvider.GetRequiredService<
+                    DbContextOptions<ApplicationDbContext>>()))
+            {
+                if (context == null || context.Category == null)
+                {
+                    throw new ArgumentNullException("Null RazorPagesMovieContext");
+                }
+
+                // Look for any movies.
+                if (context.Category.Any())
+                {
+                    return;   // DB has been seeded
+                }
+
+                context.Category.AddRange(
+                    new Category
+                    {
+                        Name = "אינטרנט",
+                        Date = DateTime.Now
+                    },
+
+                    new Category
+                    {
+                        Name = "משחקים",
+                        Date = DateTime.Now
+                    },
+
+                    new Category
+                    {
+                        Name = "חדשות",
+                        Date = DateTime.Now
+                    },
+
+                    new Category
+                    {
+                        Name = "ספורט",
+                        Date = DateTime.Now
+                    }
+                );
+                context.SaveChanges();
+            }
+        }
+
+    }
+    
+    in Program.cs we add:
+    //Seed Data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    //SeedData.Initialize(services);
+    SeedData.SeedUser(services).Wait();
+}
