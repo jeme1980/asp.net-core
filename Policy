@@ -1,0 +1,11 @@
+builder.Services.AddAuthorization(options => 
+options.AddPolicy("adminaccess",policy => policy.RequireRole("admin"))
+);
+
+builder.Services.AddMvc(o =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    o.Filters.Add(new AuthorizeFilter(policy));
+});
