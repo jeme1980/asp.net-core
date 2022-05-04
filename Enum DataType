@@ -1,0 +1,17 @@
+public class PersonalMember : Member
+{
+    [Required, Display(Name = "First Name")]
+    public string FirstName { get; set; }
+
+    [Required, Display(Name = "Last Name")]
+    public string LastName { get; set; }
+
+    [EnumDataType(typeof(Gender))]
+    public Gender GenderType { get; set; }
+}
+
+public enum Gender
+{
+    Male = 1,
+    Female = 2
+}
