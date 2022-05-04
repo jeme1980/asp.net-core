@@ -1,0 +1,14 @@
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    builder.Entity<User>()
+        .HasIndex(u => u.Email)
+        .IsUnique();
+}
+
+
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Person>()
+            .HasIndex(p => new { p.FirstName, p.LastName })
+            .IsUnique(true);
+    }
