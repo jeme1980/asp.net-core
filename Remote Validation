@@ -1,0 +1,17 @@
+[AcceptVerbs("Get","Post")]
+        public async Task<IActionResult> CheakPostNameExist(Post post)
+        {
+            var result = await _context.Post.AsNoTracking().FirstOrDefaultAsync(p => p.PostName == post.PostName);
+            if (result == null)
+            {
+                return Json(true);
+            }
+            else
+            {
+                return Json($"{post.Name} is exist");
+            }
+        }
+        
+        
+        [Remote("CheakPostNameExist","Post")]
+        public string? PostName { get; set; }
