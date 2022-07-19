@@ -36,3 +36,44 @@ private bool DeleteOldImage(string WebRootPath, string folder, string oldFileNam
             }
             return oldImage;
         }
+====================================================================================
+create class helper.cs
+
+public static bool DeleteOldImage(string WebRootPath, string folder, string oldFileNameToBeDeleted)
+        {
+            var uploadfolder = Path.Combine(WebRootPath, folder);
+            if (!string.IsNullOrEmpty(oldFileNameToBeDeleted))
+            {
+                var oldpath = Path.Combine(uploadfolder, oldFileNameToBeDeleted);
+                if (System.IO.File.Exists(oldpath))
+                {
+                    System.IO.File.Delete(oldpath);
+                    return true;
+                }
+            }
+            return false;
+        }
+        public static async Task<string> uploadNewImage(string oldImage, IFormFile UploadImage, String webrootpath, string folder)
+        {
+            if ((UploadImage != null) && (UploadImage.Length > 0))
+            {
+                if (!string.IsNullOrEmpty(oldImage) && (!string.IsNullOrWhiteSpace(oldImage)))
+                {
+                    DeleteOldImage(webrootpath, folder, oldImage);
+                }
+                string imgExe = Path.GetExtension(UploadImage.FileName);
+                string newImgName = Guid.NewGuid().ToString() + imgExe;
+                string uploadfolder = Path.Combine(webrootpath, folder);
+                if (!Directory.Exists(uploadfolder))
+                {
+                    Directory.CreateDirectory(uploadfolder);
+                }
+                var newpath = Path.Combine(uploadfolder, newImgName);
+                using (var fs = new FileStream(newpath, FileMode.Create))
+                {
+                    await UploadImage.CopyToAsync(fs);
+                }
+                return newImgName;
+            }
+            return oldImage;
+        }
