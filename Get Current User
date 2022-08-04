@@ -27,3 +27,50 @@ var email = user.Email;
 
 ==============================================================================================
 
+public class YourControllerNameController : Controller
+{
+    private readonly UserManager<ApplicationUser> _userManager;
+    
+    public YourControllerNameController(UserManager<ApplicationUser> userManager)
+    {
+        _userManager = userManager;
+    }
+
+    public async Task<IActionResult> YourMethodName()
+    {
+        var userId =  User.FindFirstValue(ClaimTypes.NameIdentifier) // will give the user's userId
+        var userName =  User.FindFirstValue(ClaimTypes.Name) // will give the user's userName
+        
+        // For ASP.NET Core <= 3.1
+        ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+        string userEmail = applicationUser?.Email; // will give the user's Email
+
+       // For ASP.NET Core >= 5.0
+       var userEmail =  User.FindFirstValue(ClaimTypes.Email) // will give the user's Email
+    }
+}
+
+
+public class OtherClass
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    public OtherClass(IHttpContextAccessor httpContextAccessor)
+    {
+       _httpContextAccessor = httpContextAccessor;
+    }
+
+   public void YourMethodName()
+   {
+      var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+   }
+}
+Then you should register anycodings_asp.net-core-1.0 IHttpContextAccessor in the Startup anycodings_asp.net-core-1.0 class as follows:
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+    // Or you can also register as follows
+
+    services.AddHttpContextAccessor();
+}
