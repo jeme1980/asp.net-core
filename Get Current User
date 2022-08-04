@@ -1,0 +1,29 @@
+ public async Task<IActionResult> YourMethodName()
+    {
+        var userId =  User.FindFirstValue(ClaimTypes.NameIdentifier) // will give the user's userId
+        var userName =  User.FindFirstValue(ClaimTypes.Name) // will give the user's userName
+
+        ApplicationUser applicationUser = await _userManager.GetUserAsync(User);
+        string userEmail = applicationUser?.Email; // will give the user's Email
+    }
+
+==============================================================================================
+
+ViewBag.usrid = _userManager.GetUserId(HttpContext.User);
+
+==============================================================================================
+
+ClaimsPrincipal currentUser = this.User;
+var currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+==============================================================================================
+
+var id = _userManager.GetUserId(User);
+
+==============================================================================================
+
+var user = await _userManager.GetUserAsync(User);
+var email = user.Email;
+
+==============================================================================================
+
